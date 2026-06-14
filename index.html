@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>agewise • your time, reflected</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: 234 179 8;
+        }
+        
+        .tail-container {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .orb {
+            animation: pulse-orb 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-orb {
+            0%, 100% { opacity: 0.6; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .age-digit {
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0);
+        }
+
+        .zodiac-symbol {
+            font-size: 4.5rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 15px rgb(234 179 8));
+        }
+
+        .timeline {
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgb(234 179 8) 0%,
+                rgb(245 158 11) 50%,
+                rgb(234 179 8) 100%);
+            background-size: 200% 100%;
+            animation: timeline-move 8s linear infinite;
+        }
+
+        @keyframes timeline-move {
+            0% { background-position: 0% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .result-section {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="tail-container bg-zinc-950 text-zinc-200 min-h-screen pb-12">
+    <div class="max-w-5xl mx-auto">
+        <!-- header -->
+        <div class="flex items-center justify-between px-8 py-6 border-b border-zinc-800">
+            <div class="flex items-center gap-x-3">
+                <div class="w-9 h-9 bg-yellow-400 flex items-center justify-center rounded-2xl shadow-inner">
+                    <i class="fa-solid fa-hourglass text-zinc-950 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="heading-font text-3xl font-semibold tracking-tighter text-white">agewise</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-8 text-sm">
+                <a onclick="resetApp()" 
+                   class="flex items-center gap-x-2 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                    <span class="hidden sm:inline">RESET</span>
+                </a>
+                <div class="h-3 w-px bg-zinc-700"></div>
+                <div class="flex items-center gap-x-1.5 text-emerald-400 text-xs font-medium">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span>LIVE INSIGHT ENGINE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 px-6 pt-8">
+            
+            <!-- INPUT PANEL -->
+            <div class="lg:col-span-4">
+                <div class="glass border border-zinc-700 rounded-3xl p-8 sticky top-6">
+                    <div class="flex justify-center mb-6">
+                        <div onclick="useSampleDate()" 
+                             class="cursor-pointer flex items-center gap-x-2 bg-zinc-900 hover:bg-zinc-800 transition-colors text-xs tracking-widest px-5 py-3 rounded-3xl border border-yellow-300/30">
+                            <i class="fa-solid fa-wand-magic-sparkles text-yellow-300"></i>
+                            <span>TRY SAMPLE BIRTHDAY</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <h1 class="heading-font text-5xl font-semibold text-white tracking-tighter mb-2">when were you born?</h1>
+                        <p class="text-zinc-400 text-sm max-w-[200px] mx-auto">your life in numbers and wisdom</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-2 tracking-wider">DATE OF BIRTH</label>
+                            <div class="relative">
+                                <input id="dob-input" 
+                                       type="date"
+                                       class="w-full bg-zinc-900 border border-zinc-700 focus:border-yellow-400 rounded-2xl px-5 py-5 text-white outline-none text-lg transition-all">
+                                <div class="absolute right-5 top-1/2 -translate-y-1/2 text-yellow-300">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="calculateAge()" 
+                                class="w-full h-14 bg-white text-zinc-900 hover:bg-amber-200 transition-all rounded-2xl font-semibold flex items-center justify-center gap-x-3 text-lg shadow-inner active:scale-[0.97]">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <span>REVEAL MY STORY</span>
+                        </button>
+                        
+                        <div class="pt-4 border-t border-zinc-800 text-[10px] flex items-center justify-center gap-x-5 text-zinc-500">
+                            <div class="flex items-center gap-x-1">
+                                <i class="fa-solid fa-lock"></i>
+                                <span>PRIVATE</span>
+                            </div>
+                            <div>•</div>
+                            <div>NO DATA SAVED</div>
+                        </div>
+                    </div>
+                    
+                    <!-- quick picks -->
+                    <div class="mt-10">
+                        <div class="text-xs text-zinc-400 mb-3 flex items-center gap-x-2">
+                            <div class="flex-1 h-px bg-zinc-800"></div>
+                            <span>QUICK DATES</span>
+                            <div class="flex-1 h-px bg-zinc-800"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 text-xs">
+                            <div onclick="setQuickDate(1995, 4, 15)" 
+                                 class="glass border border-zinc-700 hover:border-yellow-400 rounded-2xl p-3 text-center cursor-pointer transition-colors">
+                                <div class="text-emerald-300 text-[10px]">GEN Z</div>
+                                <div class="font-mono">95.05.15</div>
+                            </div>
+                            <div onclick="setQuickDate(1988, 11, 3)" 
+                                 class="glass border border-zinc-700 hover:border-yellow-400 rounded-2xl p-3 text-center cursor-pointer transition-colors">
+                                <div class="text-blue-300 text-[10px]">MILLENIAL</div>
+                                <div class="font-mono">88.12.03</div>
+                            </div>
+                            <div onclick="setQuickDate(1975, 7, 22)" 
+                                 class="glass border border-zinc-700 hover:border-yellow-400 rounded-2xl p-3 text-center cursor-pointer transition-colors">
+                                <div class="text-purple-300 text-[10px]">X</div>
+                                <div class="font-mono">75.07.22</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RESULTS -->
+            <div id="results-panel" class="lg:col-span-8 hidden">
+                <div class="result-section bg-zinc-900 border border-zinc-700/70 rounded-3xl overflow-hidden">
+                    
+                    <!-- header bar -->
+                    <div class="h-2 bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-300 timeline"></div>
+                    
+                    <!-- age display -->
+                    <div class="px-10 pt-8 pb-6 flex items-end gap-x-6 border-b border-zinc-800">
+                        <div>
+                            <div class="text-xs tracking-[2px] font-medium text-amber-300 mb-1 flex items-center gap-x-2">
+                                <span class="w-px h-3 bg-amber-300"></span>
+                                YOU ARE
+                            </div>
+                            <div id="age-years" 
+                                 class="age-digit heading-font text-[7rem] leading-none font-semibold text-white stat-number">29</div>
+                            <div class="flex items-baseline gap-x-3 text-zinc-400">
+                                <div id="age-months-display" class="text-4xl font-light">4</div>
+                                <div class="text-sm leading-none">MONTHS</div>
+                                <div id="age-days-display" class="text-4xl font-light">12</div>
+                                <div class="text-sm leading-none">DAYS</div>
+                            </div>
+                        </div>
+                        
+                        <!-- orb -->
+                        <div class="ml-auto relative flex-shrink-0">
+                            <div class="orb w-28 h-28 rounded-full bg-gradient-to-br from-yellow-300/10 to-transparent border border-yellow-300/30 flex items-center justify-center">
+                                <div class="w-20 h-20 rounded-full bg-zinc-900 flex items-center justify-center text-5xl" id="zodiac-symbol">♌</div>
+                            </div>
+                            <div id="zodiac-name" 
+                                 class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-zinc-900 text-amber-200 text-xs font-medium px-5 py-1 rounded-3xl border border-yellow-300/40 whitespace-nowrap">
+                                LEO
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800">
+                        
+                        <!-- stat 1 -->
+                        <div class="bg-zinc-900 p-6 hover:bg-zinc-800/70 transition-colors">
+                            <div class="flex justify-between">
+                                <div>
+                                    <div class="text-xs text-zinc-400">TOTAL DAYS</div>
+                                    <div id="total-days" class="stat-number heading-font text-5xl text-white mt-1">10845</div>
+                                </div>
+                                <div class="text-4xl text-yellow-400/60">
+                                    <i class="fa-solid fa-calendar"></i>
+                                </div>
+                            </div>
+                            <div id="total-days-label" class="text-[10px] text-emerald-400 mt-6 font-medium">3,421 weeks lived</div>
+                        </div>
+                        
+                        <!-- stat 2 -->
+                        <div class="bg-zinc-900 p-6 hover:bg-zinc-800/70 transition-colors border-l border-zinc-700">
+                            <div class="flex justify-between">
+                                <div>
+                                    <div class="text-xs text-zinc-400">NEXT BIRTHDAY</div>
+                                    <div id="days-to-birthday" class="stat-number heading-font text-5xl text-white mt-1">47</div>
+                                </div>
+                                <div class="text-4xl text-rose-400/60">
+                                    <i class="fa-solid fa-gift"></i>
+                                </div>
+                            </div>
+                            <div class="text-xs text-rose-400 mt-8 flex items-center gap-x-1">
+                                <span class="relative flex h-3 w-3">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-400"></span>
+                                </span>
+                                DAYS AWAY
+                            </div>
+                        </div>
+                        
+                        <!-- stat 3 -->
+                        <div class="bg-zinc-900 p-6 hover:bg-zinc-800/70 transition-colors border-l border-zinc-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-xs text-zinc-400">BORN ON</div>
+                                    <div id="birth-weekday" class="text-3xl font-medium text-white mt-3">WEDNESDAY</div>
+                                    <div id="birth-date-str" class="font-mono text-xs text-zinc-500">MAY 15 1995</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- stat 4 -->
+                        <div class="bg-zinc-900 p-6 hover:bg-zinc-800/70 transition-colors border-l border-zinc-700 flex flex-col justify-between">
+                            <div class="text-xs text-zinc-400">LIVED IN</div>
+                            <div class="flex items-baseline gap-x-px">
+                                <div id="total-months" class="stat-number heading-font text-6xl font-light text-amber-200">356</div>
+                                <div class="text-sm text-amber-200/70 font-light">MONTHS</div>
+                            </div>
+                            <div onclick="showMoreInfo()" 
+                                 class="self-end text-[10px] bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-2xl cursor-pointer flex items-center gap-x-2">
+                                <i class="fa-solid fa-info-circle"></i>
+                                <span>MORE STATS</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- advice -->
+                    <div class="p-8 bg-zinc-900 border-t border-b border-zinc-700">
+                        <div class="flex items-center gap-x-3 text-xs mb-4">
+                            <i class="fa-solid fa-comment-dots text-yellow-400"></i>
+                            <span class="uppercase tracking-widest font-semibold text-yellow-400 text-sm">Personal Insight</span>
+                        </div>
+                        
+                        <div id="insight-text" 
+                             class="text-lg leading-tight text-zinc-100 italic font-light">
+                            Your twenties are often less about finding your passion and more about collecting enough experiences to recognize it when you see it.
+                        </div>
+                        
+                        <div class="flex items-center gap-x-2 mt-8 text-xs">
+                            <div class="px-3 py-1 bg-zinc-800 text-amber-300 rounded-3xl flex items-center">
+                                <i class="fa-solid fa-seedling mr-2"></i>
+                                <span id="age-context">AGE 29 • IN YOUR PRIME</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- today's life signal -->
+                    <div class="px-8 py-7 bg-zinc-900 flex flex-col md:flex-row gap-8 items-center">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-x-2 text-teal-300 text-xs mb-2">
+                                <i class="fa-solid fa-signal"></i>
+                                <span class="font-medium">TODAY'S LIFE SIGNAL</span>
+                            </div>
+                            <div id="life-signal" 
+                                 class="text-zinc-100 text-[21px] leading-tight">
+                                Spend 17 minutes learning a micro-skill that will compound in 3 years
+                            </div>
+                        </div>
+                        
+                        <button onclick="generateNewSignal()" 
+                                class="flex-shrink-0 px-7 py-6 bg-teal-950 hover:bg-teal-900 border border-teal-800 rounded-3xl transition-all active:scale-95 flex flex-col items-center justify-center gap-y-1">
+                            <i class="fa-solid fa-arrows-rotate text-teal-400"></i>
+                            <span class="text-teal-400 text-xs tracking-widest font-medium">NEW</span>
+                        </button>
+                    </div>
+                    
+                    <!-- footer bar -->
+                    <div class="px-8 py-5 bg-black/40 flex items-center justify-between text-xs">
+                        <div onclick="resetApp()" 
+                             class="flex items-center gap-x-2 text-zinc-400 hover:text-white cursor-pointer">
+                            <i class="fa-solid fa-chevron-left"></i>
+                            <span>CHANGE DATE</span>
+                        </div>
+                        
+                        <div class="flex items-center text-[10px] font-mono text-zinc-600">
+                            CALCULATED JUST NOW
+                            <div class="ml-3 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+                        </div>
+                        
+                        <div class="text-yellow-400 flex items-center gap-x-1 cursor-pointer" onclick="copyToClipboard()">
+                            <i class="fa-solid fa-copy"></i>
+                            <span class="text-xs">COPY INSIGHT</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- extra metrics row -->
+                <div class="grid grid-cols-3 gap-4 mt-8">
+                    <div class="glass rounded-3xl p-5 text-center border border-zinc-700">
+                        <div class="text-xs text-zinc-400">YEARS LIVED</div>
+                        <div id="years-lived" class="text-7xl heading-font text-white mt-1 mb-px stat-number">29</div>
+                        <div class="h-1.5 bg-yellow-400/20 rounded-3xl overflow-hidden">
+                            <div id="year-progress" class="h-1.5 w-3/4 bg-yellow-400 rounded-3xl"></div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="showZodiacModal()" class="glass rounded-3xl p-5 text-center border border-zinc-700 cursor-pointer">
+                        <div class="flex justify-center text-4xl mb-3" id="mini-zodiac">♌</div>
+                        <div class="text-xs text-amber-400">YOUR ZODIAC</div>
+                        <div id="mini-zodiac-name" class="font-semibold text-lg text-white">LEO</div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-5 text-center border border-zinc-700 flex flex-col justify-center">
+                        <div class="text-xs text-zinc-400 mb-1">TOTAL WEEKS</div>
+                        <div id="total-weeks" class="text-5xl font-light text-white stat-number">1549</div>
+                        <div class="text-teal-400 text-xs mt-4 flex items-center justify-center gap-x-3">
+                            <i class="fa-solid fa-infinity"></i>
+                            <span>AND COUNTING</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PLACEHOLDER WHEN NO RESULTS -->
+            <div id="placeholder-panel" class="lg:col-span-8 flex flex-col items-center justify-center py-20 text-center">
+                <div class="max-w-xs">
+                    <div class="inline-flex items-center justify-center w-20 h-20 mb-8 rounded-3xl bg-gradient-to-br from-yellow-400/10 to-transparent border border-yellow-400/10">
+                        <span class="text-6xl">🌀</span>
+                    </div>
+                    
+                    <h2 class="heading-font text-4xl font-medium text-white mb-3">Your story awaits</h2>
+                    <p class="text-zinc-400">Enter your birthdate to unlock exact age metrics, your zodiac profile, and a personalized life insight crafted just for your age.</p>
+                    
+                    <div class="mt-16 text-[10px] flex flex-col items-center">
+                        <div class="flex -space-x-6">
+                            <div class="w-6 h-6 bg-purple-300 rounded-2xl flex items-center justify-center text-xs ring-2 ring-zinc-900">♍</div>
+                            <div class="w-6 h-6 bg-sky-300 rounded-2xl flex items-center justify-center text-xs ring-2 ring-zinc-900">♓</div>
+                            <div class="w-6 h-6 bg-rose-300 rounded-2xl flex items-center justify-center text-xs ring-2 ring-zinc-900">♐</div>
+                        </div>
+                        <div class="mt-6 text-zinc-500">Already helped 184,291 humans reflect on their time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODALS -->
+    <!-- zodiac modal -->
+    <div onclick="if(event.target.id === 'zodiac-modal') hideZodiacModal()" 
+         id="zodiac-modal"
+         class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div onclick="event.stopImmediatePropagation()" 
+             class="max-w-md w-full mx-4 glass border border-yellow-200/30 rounded-3xl p-8">
+            <div class="flex justify-between items-center">
+                <div class="heading-font text-3xl">Your sign</div>
+                <div onclick="hideZodiacModal()" 
+                     class="w-9 h-9 flex items-center justify-center text-2xl leading-none text-zinc-400 cursor-pointer">×</div>
+            </div>
+            
+            <div class="flex justify-center my-12">
+                <div id="modal-zodiac-symbol" class="zodiac-symbol text-8xl">♌</div>
+            </div>
+            
+            <div id="modal-zodiac-name" class="text-center text-5xl heading-font font-medium mb-2">LEO</div>
+            <div id="modal-zodiac-dates" class="text-center text-amber-300 text-sm font-light">July 23 — August 22</div>
+            
+            <div class="my-10 border-t border-b border-yellow-300/10 py-7 text-xs leading-relaxed text-zinc-300">
+                The lion. Bold, warm, and generous. You shine when you allow yourself to be seen. 
+                Your natural charisma is a gift — use it to uplift others rather than seeking the spotlight constantly.
+            </div>
+            
+            <button onclick="hideZodiacModal()" 
+                    class="w-full py-6 text-sm tracking-widest border border-yellow-300/60 hover:bg-white/5 transition-colors rounded-3xl">
+                CLOSE WINDOW
+            </button>
+        </div>
+    </div>
+    
+    <!-- toast -->
+    <div id="toast" 
+         class="hidden fixed bottom-6 right-6 bg-zinc-800 border border-emerald-400 text-emerald-300 rounded-3xl shadow-2xl px-5 py-3 flex items-center gap-x-3 text-sm">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toast-text">Insight copied to clipboard</span>
+    </div>
+    
+    <footer class="text-center text-zinc-600 text-xs mt-16">
+        Built as a demonstration • All calculations are local
+    </footer>
+    
+    <script>
+        // Tailwind script run
+        function initializeTailwind() {
+            tailwind.config = {
+                content: [],
+                theme: {
+                    extend: {}
+                }
+            }
+        }
+        
+        let currentAge = 0;
+        let currentDOB = null;
+        
+        const zodiacSigns = [
+            { name: "CAPRICORN", symbol: "♑", start: "12-22", end: "01-19" },
+            { name: "AQUARIUS", symbol: "♒", start: "01-20", end: "02-18" },
+            { name: "PISCES", symbol: "♓", start: "02-19", end: "03-20" },
+            { name: "ARIES", symbol: "♈", start: "03-21", end: "04-19" },
+            { name: "TAURUS", symbol: "♉", start: "04-20", end: "05-20" },
+            { name: "GEMINI", symbol: "♊", start: "05-21", end: "06-20" },
+            { name: "CANCER", symbol: "♋", start: "06-21", end: "07-22" },
+            { name: "LEO", symbol: "♌", start: "07-23", end: "08-22" },
+            { name: "VIRGO", symbol: "♍", start: "08-23", end: "09-22" },
+            { name: "LIBRA", symbol: "♎", start: "09-23", end: "10-22" },
+            { name: "SCORPIO", symbol: "♏", start: "10-23", end: "11-21" },
+            { name: "SAGITTARIUS", symbol: "♐", start: "11-22", end: "12-21" }
+        ];
+        
+        const advicePools = {
+            young: [
+                "Most people spend years worrying about what others think. The funny thing is everyone else is too busy worrying about themselves.",
+                "Your mistakes aren't setbacks, they're the plot twists that make your story interesting.",
+                "At your age, curiosity is your superpower. Don't let anyone convince you otherwise.",
+                "The best time to start was yesterday. The second best time is right now."
+            ],
+            twenties: [
+                "Your twenties are less about finding your passion and more about collecting enough experiences so you recognize it when it appears.",
+                "The habits you build now will run on autopilot in 10 years. Choose them wisely.",
+                "One hour a week learning a new skill turns into 52 hours a year. Consistency always beats intensity.",
+                "Stop waiting for permission to create the life you want to live."
+            ],
+            thirties: [
+                "Your thirties are when your values start showing up in your calendar instead of just your journal.",
+                "The quality of your life is determined by how honestly you answer the question: am I growing or just getting older?",
+                "A single decision to prioritize your health today will pay dividends for decades.",
+                "You've survived 100% of your worst days. That's a track record worth betting on."
+            ],
+            forties: [
+                "Your future health is being written by the tiny choices you make when no one is watching.",
+                "The best investment you'll ever make is in the relationships that make you feel most alive.",
+                "Comparison ends the moment you realize everyone is running a different race on a different track.",
+                "You've gathered enough wisdom to know that peace is the new success."
+            ],
+            fifties: [
+                "You've lived through enough chapters to know that every ending is also a beginning.",
+                "The greatest gift you can give your future self is the habit of moving your body every single day.",
+                "The stories you tell yourself about your age matter more than the number itself.",
+                "Legacy isn't what you leave behind — it's who you become along the way."
+            ],
+            wisdom: [
+                "You've already seen technologies, trends and beliefs rise and fall. That perspective is priceless.",
+                "The older you get, the more you realize how little you actually need to be happy.",
+                "Your adaptability is the most valuable skill you've developed. Keep using it.",
+                "Every year you live is a vote of confidence in the future. Keep voting."
+            ]
+        };
+        
+        const lifeSignals = [
+            "Review one financial decision you made this month",
+            "Take a 20 minute walk with zero distractions",
+            "Write down the name of someone you should reconnect with",
+            "Learn one new word or concept today",
+            "Spend 15 minutes planning your next adventure",
+            "Do one act of kindness with zero expectation of return",
+            "Identify a habit you want to drop this season",
+            "Journal for 7 minutes about what you're proud of",
+            "Try a completely new food or recipe today",
+            "Call your oldest friend just to say hello",
+            "Set a micro-goal you can complete before bed",
+            "Practice the 4-7-8 breathing technique for 60 seconds"
+        ];
+        
+        function getZodiac(month, day) {
+            const dateStr = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            
+            for (let i = 0; i < zodiacSigns.length; i++) {
+                const sign = zodiacSigns[i];
+                if (sign.start <= dateStr && dateStr <= sign.end) {
+                    return sign;
+                }
+            }
+            
+            // Capricorn edge case
+            if (dateStr >= "12-22" || dateStr <= "01-19") {
+                return zodiacSigns[0];
+            }
+            return zodiacSigns[3]; // default aries
+        }
+        
+        function calculatePreciseAge(birthDate) {
+            const today = new Date();
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+            
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            // Total days
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const totalDaysLived = Math.floor((today.getTime() - birthDate.getTime()) / msPerDay);
+            
+            const totalWeeks = Math.floor(totalDaysLived / 7);
+            const totalMonthsApprox = Math.floor(years * 12 + months);
+            
+            // Next birthday
+            let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday.getTime() < today.getTime()) {
+                nextBirthday.setFullYear(today.getFullYear() + 1);
+            }
+            const daysUntilBirthday = Math.ceil((nextBirthday.getTime() - today.getTime()) / msPerDay);
+            
+            // Day name
+            const weekdayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+            const birthWeekday = weekdayNames[birthDate.getDay()];
+            
+            return {
+                years: years,
+                months: months,
+                days: days,
+                totalDays: totalDaysLived,
+                totalWeeks: totalWeeks,
+                totalMonths: totalMonthsApprox,
+                daysToNextBirthday: daysUntilBirthday,
+                birthWeekday: birthWeekday,
+                birthDateStr: birthDate.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                }).toUpperCase()
+            };
+        }
+        
+        function getAdviceForAge(age) {
+            let poolKey = 'wisdom';
+            
+            if (age < 20) poolKey = 'young';
+            else if (age < 30) poolKey = 'twenties';
+            else if (age < 40) poolKey = 'thirties';
+            else if (age < 50) poolKey = 'forties';
+            else if (age < 65) poolKey = 'fifties';
+            
+            const pool = advicePools[poolKey];
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            return pool[randomIndex];
+        }
+        
+        function getRandomLifeSignal() {
+            const idx = Math.floor(Math.random() * lifeSignals.length);
+            return lifeSignals[idx];
+        }
+        
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+        
+        function calculateAge() {
+            const input = document.getElementById('dob-input');
+            if (!input.value) {
+                input.classList.add('!border-red-400');
+                setTimeout(() => {
+                    input.classList.remove('!border-red-400');
+                }, 1200);
+                return;
+            }
+            
+            const dob = new Date(input.value);
+            const today = new Date();
+            
+            if (dob > today) {
+                showToast("You can't be born in the future!", true);
+                return;
+            }
+            
+            currentDOB = dob;
+            
+            const ageData = calculatePreciseAge(dob);
+            currentAge = ageData.years;
+            
+            // Zodiac
+            const zodiac = getZodiac(dob.getMonth() + 1, dob.getDate());
+            
+            // Populate results
+            document.getElementById('age-years').textContent = ageData.years;
+            document.getElementById('age-months-display').textContent = ageData.months;
+            document.getElementById('age-days-display').textContent = ageData.days;
+            
+            document.getElementById('total-days').textContent = formatNumber(ageData.totalDays);
+            document.getElementById('total-weeks').textContent = formatNumber(ageData.totalWeeks);
+            document.getElementById('total-months').textContent = formatNumber(ageData.totalMonths);
+            document.getElementById('days-to-birthday').textContent = ageData.daysToNextBirthday;
+            
+            document.getElementById('birth-weekday').textContent = ageData.birthWeekday;
+            document.getElementById('birth-date-str').textContent = ageData.birthDateStr;
+            
+            // Zodiac
+            document.getElementById('zodiac-symbol').innerHTML = zodiac.symbol;
+            document.getElementById('zodiac-name').innerHTML = zodiac.name;
+            document.getElementById('mini-zodiac').innerHTML = zodiac.symbol;
+            document.getElementById('mini-zodiac-name').innerHTML = zodiac.name;
+            
+            // Insight
+            const insight = getAdviceForAge(ageData.years);
+            document.getElementById('insight-text').innerHTML = `"${insight}"`;
+            
+            // Age context
+            let context = '';
+            if (ageData.years < 18) context = `AGE ${ageData.years} • STILL GROWING`;
+            else if (ageData.years < 30) context = `AGE ${ageData.years} • BUILDING`;
+            else if (ageData.years < 45) context = `AGE ${ageData.years} • EXPANDING`;
+            else context = `AGE ${ageData.years} • REFINING`;
+            document.getElementById('age-context').textContent = context;
+            
+            // Life signal
+            const signal = getRandomLifeSignal();
+            document.getElementById('life-signal').innerHTML = signal;
+            
+            // Show results
+            document.getElementById('placeholder-panel').classList.add('hidden');
+            const resultsPanel = document.getElementById('results-panel');
+            resultsPanel.classList.remove('hidden');
+            resultsPanel.style.animation = 'fadeInUp 1s ease';
+            
+            // Progress bar mock
+            const progressPercent = Math.min(98, Math.max(12, (ageData.years % 10) * 10));
+            document.getElementById('year-progress').style.width = `${progressPercent}%`;
+            
+            // Subtle confetti
+            if (Math.random() > 0.6) {
+                triggerMiniConfetti();
+            }
+        }
+        
+        function triggerMiniConfetti() {
+            // Simple confetti using DOM
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.textContent = ['✦', '⬡', '🜁'][Math.floor(Math.random()*3)];
+                    confetti.style.position = 'fixed';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-20px';
+                    confetti.style.fontSize = '13px';
+                    confetti.style.opacity = Math.random() + 0.6;
+                    confetti.style.transition = `all ${2 + Math.random() * 3}s cubic-bezier(0.16, 1, 0.3, 1)`;
+                    document.body.append(confetti);
+                    
+                    const angle = Math.random() * 80 - 30;
+                    setTimeout(() => {
+                        confetti.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${angle * 7}deg)`;
+                        confetti.style.opacity = '0';
+                    }, 30);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 2.5);
+            }
+        }
+        
+        function generateNewSignal() {
+            const signalEl = document.getElementById('life-signal');
+            signalEl.style.transitionDuration = '0ms';
+            signalEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                const signal = getRandomLifeSignal();
+                signalEl.textContent = signal;
+                signalEl.style.transitionDuration = '420ms';
+                signalEl.style.opacity = '1';
+            }, 180);
+        }
+        
+        function showToast(message, error = false) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            
+            toastText.textContent = message;
+            
+            if (error) {
+                toast.style.borderColor = '#f43f5e';
+                toast.style.color = '#fda4af';
+            } else {
+                toast.style.borderColor = '#4ade80';
+                toast.style.color = '#86efac';
+            }
+            
+            toast.classList.remove('hidden');
+            toast.style.transform = 'translateY(30px)';
+            toast.style.opacity = '0';
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 2700);
+        }
+        
+        function copyToClipboard() {
+            const insightText = document.getElementById('insight-text').innerText;
+            navigator.clipboard.writeText(insightText).then(() => {
+                showToast('Insight copied to clipboard ✓');
+            });
+        }
+        
+        function showMoreInfo() {
+            const message = currentAge > 40 ? 
+                "You have lived roughly " + Math.floor(currentAge * 365.25) + " days. That is a lot of sunrises." : 
+                "Every day you have lived is a unique combination of time and choices that will never repeat.";
+            showToast(message);
+        }
+        
+        function showZodiacModal() {
+            if (!currentDOB) return;
+            
+            const zodiac = getZodiac(currentDOB.getMonth() + 1, currentDOB.getDate());
+            
+            document.getElementById('modal-zodiac-symbol').innerHTML = zodiac.symbol;
+            document.getElementById('modal-zodiac-name').innerHTML = zodiac.name;
+            document.getElementById('modal-zodiac-dates').innerHTML = getZodiacDateRange(zodiac);
+            
+            document.getElementById('zodiac-modal').classList.remove('hidden');
+            document.getElementById('zodiac-modal').classList.add('flex');
+        }
+        
+        function hideZodiacModal() {
+            const modal = document.getElementById('zodiac-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        
+        function getZodiacDateRange(zodiac) {
+            const map = {
+                "CAPRICORN": "Dec 22 – Jan 19",
+                "AQUARIUS": "Jan 20 – Feb 18",
+                "PISCES": "Feb 19 – Mar 20",
+                "ARIES": "Mar 21 – Apr 19",
+                "TAURUS": "Apr 20 – May 20",
+                "GEMINI": "May 21 – Jun 20",
+                "CANCER": "Jun 21 – Jul 22",
+                "LEO": "Jul 23 – Aug 22",
+                "VIRGO": "Aug 23 – Sep 22",
+                "LIBRA": "Sep 23 – Oct 22",
+                "SCORPIO": "Oct 23 – Nov 21",
+                "SAGITTARIUS": "Nov 22 – Dec 21"
+            };
+            return map[zodiac.name] || "Unknown";
+        }
+        
+        function setQuickDate(year, month, day) {
+            const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            const input = document.getElementById('dob-input');
+            input.value = dateString;
+            calculateAge();
+        }
+        
+        function useSampleDate() {
+            // random between 1970 and 2005
+            const year = 1970 + Math.floor(Math.random() * 36);
+            const month = 1 + Math.floor(Math.random() * 12);
+            const day = 1 + Math.floor(Math.random() * 27);
+            setQuickDate(year, month, day);
+        }
+        
+        function resetApp() {
+            document.getElementById('results-panel').classList.add('hidden');
+            document.getElementById('placeholder-panel').classList.remove('hidden');
+            document.getElementById('dob-input').value = '';
+            currentDOB = null;
+        }
+        
+        function simulateInitialLoad() {
+            // Demo state
+            setTimeout(() => {
+                const input = document.getElementById('dob-input');
+                input.value = '1995-05-15';
+                calculateAge();
+            }, 420);
+        }
+        
+        // Keyboard support
+        function handleKeyboard(e) {
+            if (e.metaKey && e.key === "k") {
+                e.preventDefault();
+                const input = document.getElementById("dob-input");
+                input.focus();
+            }
+        }
+        
+        // Main initialization
+        function initialize() {
+            initializeTailwind();
+            
+            // Make sure date max is today
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('dob-input');
+            dateInput.setAttribute('max', today);
+            
+            // Keyboard
+            document.addEventListener('keydown', handleKeyboard);
+            
+            // Demo load
+            simulateInitialLoad();
+            
+            // Easter egg: click on logo
+            const logo = document.querySelector('.heading-font');
+            let clicks = 0;
+            logo.addEventListener('click', () => {
+                clicks++;
+                if (clicks > 4) {
+                    triggerMiniConfetti();
+                    showToast("You found the secret time machine ✨");
+                    clicks = 0;
+                }
+            });
+            
+            // Make the whole page feel alive
+            console.log('%cAgewise ready. Time is on your side.', 'font-family:monospace;font-size:10px;color:#f59e0b');
+        }
+        
+        window.onload = initialize;
+    </script>
+</body>
+</html>
